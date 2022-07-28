@@ -6,3 +6,52 @@ JOIN inventory b ON a.inventory_id = b.inventory_id
 JOIN film c ON b.film_id = c.film_id
 GROUP BY 1
 ORDER BY 3 DESC;
+
+/* All films, rental rate, revenue */
+
+SELECT c.title, c.rental_rate, c.rating,
+ COUNT(*) AS count_rental,
+ SUM(f.amount) AS total_revenue,
+ c.rental_rate * COUNT(*) AS rental_revenue
+FROM rental a
+JOIN inventory b ON a.inventory_id = b.inventory_id
+JOIN film c ON b.film_id = c.film_id
+JOIN film_category d ON c.film_id = d.film_id
+JOIN category e ON d.category_id = e.category_id
+JOIN payment f ON a.rental_id = f.rental_id
+GROUP BY 1, 2, 3
+ORDER BY 5 DESC;
+
+
+
+/* rating, rentals, revenue */
+
+SELECT c.rating,
+ COUNT(*) AS count_rental,
+ ROUND(AVG(c.rental_rate),2) AS avg_rental_rate,
+ SUM(f.amount) AS total_revenue
+FROM rental a
+JOIN inventory b ON a.inventory_id = b.inventory_id
+JOIN film c ON b.film_id = c.film_id
+JOIN film_category d ON c.film_id = d.film_id
+JOIN category e ON d.category_id = e.category_id
+JOIN payment f ON a.rental_id = f.rental_id
+GROUP BY 1
+ORDER BY 2 DESC;
+
+
+
+/* category, rentals, revenue */
+
+SELECT e.name AS genre,
+ COUNT(*) AS count_rental,
+ ROUND(AVG(c.rental_rate),2) AS avg_rental_rate,
+ SUM(f.amount) AS total_revenue
+FROM rental a
+JOIN inventory b ON a.inventory_id = b.inventory_id
+JOIN film c ON b.film_id = c.film_id
+JOIN film_category d ON c.film_id = d.film_id
+JOIN category e ON d.category_id = e.category_id
+JOIN payment f ON a.rental_id = f.rental_id
+GROUP BY 1
+ORDER BY 2 DESC;
