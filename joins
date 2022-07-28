@@ -1,0 +1,8 @@
+--AVG rental duration by rating
+
+SELECT c.rating, ROUND(AVG(CEILING(EXTRACT(EPOCH FROM (a.return_date - a.rental_date))/86400))), COUNT(a.rental_id)
+FROM rental a
+JOIN inventory b ON a.inventory_id = b.inventory_id
+JOIN film c ON b.film_id = c.film_id
+GROUP BY 1
+ORDER BY 3 DESC;
