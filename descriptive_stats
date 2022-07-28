@@ -1,0 +1,49 @@
+--Descriptive stats for 'rating' column FROM film
+
+SELECT rating, COUNT(*)
+FROM film
+GROUP BY 1
+ORDER BY 2 DESC;
+
+--Descriptive statistics of 'special_features' column FROM film
+
+SELECT special_features, COUNT(*)
+FROM film
+WHERE special_features = (SELECT mode() WITHIN GROUP (ORDER BY special_features) FROM film)
+GROUP BY 1
+HAVING COUNT(*) > 1;
+
+
+--Descriptive statistics of numerical columns FROM film
+
+SELECT 'count',
+COUNT(release_year) AS release_year,
+COUNT(rental_duration) AS rental_duration,
+COUNT(rental_rate) AS rental_rate,
+COUNT(length) AS length,
+COUNT(replacement_cost) AS replacement_cost
+FROM film
+UNION
+SELECT 'avg',
+ROUND(AVG(release_year),2),
+ROUND(AVG(rental_duration),2),
+ROUND(AVG(rental_rate),2),
+ROUND(AVG(length),2),
+ROUND(AVG(replacement_cost),2)
+FROM film
+UNION
+SELECT 'min',
+MIN(release_year),
+MIN(rental_duration),
+MIN(rental_rate),
+MIN(length),
+MIN(replacement_cost)
+FROM film
+UNION
+SELECT 'max',
+MAX(release_year),
+MAX(rental_duration),
+MAX(rental_rate),
+MAX(length),
+MAX(replacement_cost)
+FROM film;
