@@ -1,0 +1,30 @@
+-- What is the surcharge for each country?
+
+WITH customer_country (customer_id, country) AS
+ (SELECT a.customer_id, d.country
+  FROM customer a
+  JOIN address b ON a.address_id = b.address_id
+  JOIN city c ON b.city_id = c.city_id
+  JOIN country d ON c.country_id = d.country_id),
+ rental_detail (rental_id, customer_id, title, rental_rate, amount, country, surcharge_flag, surcharge) AS
+ (SELECT a.rental_id, a.customer_id, c.title,
+  c.rental_rate, e.amount, d.country,
+  CASE WHEN e.amount - c.rental_rate > 0 THEN 1
+   WHEN e.amount - c.rental_rate < 0 THEN 2 END AS surcharge_flag,
+  CASE WHEN e.amount - c.rental_rate > 0 THEN e.amount - c.rental_rate END AS surcharge
+  FROM rental a
+  JOIN inventory b ON a.inventory_id = b.inventory_id
+  JOIN film c ON b.film_id = c.film_id
+  JOIN customer_country d ON a.customer_id = d.customer_id
+  JOIN payment e ON a.rental_id = e.rental_id)
+
+SELECT country, SUM(surcharge_flag) AS count_with_surcharge,
+ COUNT(*) AS total_rentals,
+ SUM(amount) AS total_revenue,
+ SUM(rental_rate) AS total_rental_rate,
+ MAX(surcharge) AS max_surcharge,
+ MIN(surcharge) AS min_surcharge,
+ ROUND(AVG(surcharge),2) AS avg_surcharge
+FROM rental_detail
+GROUP BY country
+ORDER BY 3 DESC;
